@@ -5,14 +5,21 @@
 }
 #side-bar {
   display: flex;
+  align-items: center;
   width: 1200px;
   margin: auto;
   height: 90vh;
 }
 #main-second-body {
-  margin: 0px;
-  height: 100vh;
-  width: 100vw;
+  height: 500px;
+  margin: auto;
+  width: 70vw;
+  margin-left: 50px;
+  background: rgba(87, 87, 87, 0.1);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.537);
+  border-radius: 10px;
 }
 #options {
   max-height: 70vh;
@@ -20,7 +27,6 @@
 #sidebar_fully_outer {
   width: 300px;
   display: flex;
-  margin-top: 30px;
   border-right: 2px solid purple;
   height: fit-content;
   flex-direction: column;
@@ -35,6 +41,7 @@
 #sidebar_inner {
   font-size: 18px;
   padding: 20px;
+  width: 250px;
 }
 #main-heading p {
   font-size: 22px;
@@ -49,6 +56,7 @@ ul li {
   border-radius: 20px;
   display: flex;
   cursor: pointer;
+  width: 160px;
 }
 ul li p {
   position: relative;
@@ -64,7 +72,7 @@ ul li:hover {
   height: 150px;
   overflow-y: auto;
   border-radius: 20px;
-  width: 120px;
+  width: 160px;
   margin: auto;
   box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.769);
   &::-webkit-scrollbar {
@@ -77,10 +85,6 @@ ul li:hover {
   display: none;
 }
 @media screen and (max-width: 1200px) {
-  #sidebar_fully_outer {
-    width: 20%;
-    height: 90%;
-  }
   #side-bar {
     width: 100%;
   }
@@ -94,36 +98,53 @@ ul li:hover {
   #icon svg {
     font-size: 20px;
   }
+  #main-second-body {
+    width: 63%;
+  }
+}
+@media screen and (max-width: 1125px) {
+  #special-options {
+    width: 140px;
+    margin-left: 20px;
+  }
 }
 @media screen and (max-width: 1000px) {
   #sidebar_fully_outer {
-    width: 30%;
     height: 92%;
-  }
-  #sidebar_fully_outer {
+    border: none;
     width: 30%;
+    margin-top: 0%;
     position: relative;
     left: 5%;
-    opacity: 100;
+    z-index: 0;
+    transition: 0.5s;
+    background-color: whitesmoke;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
   }
   ul li p {
     font-size: 14px;
-    top: 4px;
   }
   #more-options-btn {
     display: block;
   }
+  #side-bar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
   #main-second-body {
+    height: 100%;
     width: 83%;
     margin-left: -18%;
-    opacity: 0.9;
-    background-color: rgb(128, 128, 128);
+    z-index: 1;
+    border: 2px solid purple;
+    padding: 1rem;
+    transition: all 0.3s ease-in-out;
   }
-  #main-heading p {
-    // display: none;
-  }
-  #options {
-    // display: none;
+
+  #options,
+  #main-heading {
+    transition: 0.5s;
   }
 }
 @media screen and (max-width: 665px) {
@@ -142,12 +163,11 @@ ul li:hover {
   #main-second-body {
     width: 80%;
     margin-left: -62%;
-    opacity: 0.9;
   }
 }
 @media screen and (max-width: 400px) {
-  #sidebar_fully_outer {
+  #more-options-btn {
     position: relative;
-    left: 3%;
+    right: 9px;
   }
 }

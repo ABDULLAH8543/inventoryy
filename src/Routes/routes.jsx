@@ -2,7 +2,7 @@ import React from "react";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import NavBar from "../pages/navBar";
 import Dashboard from "../pages/dashboard";
-import About from "../pages/about";
+import Add from "../pages/addProducts";
 import Sidebar from "../pages/sideBar";
 
 const Mainpage = () => {
@@ -15,7 +15,7 @@ const Mainpage = () => {
           <Routes>
             <Route path="/" element={<Dashboard />} />
             <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/about" element={<About />} />
+            <Route path="/add" element={<Add />} />
           </Routes>
         </div>
       </div>
