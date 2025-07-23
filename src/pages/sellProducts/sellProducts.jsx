@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import "./showProducts.scss";
+import "../showProducts/showProducts.scss";
 
 function ShowProducts() {
   const [products, setProducts] = useState([]);
@@ -7,37 +7,26 @@ function ShowProducts() {
   const [categories, setCategories] = useState([]);
   const [searchCategory, setSearchCategory] = useState("");
   const [searchName, setSearchName] = useState("");
+
   const [editIndex, setEditIndex] = useState(null);
-  const [formData, setFormData] = useState({
-    name: "",
-    quantity: "",
-    totalPrice: "",
-    category: "",
-    size: "",
-    pricePerPiece: "",
-    sellingPrice: "",
-  });
+  const [formData, setFormData] = useState({ quantity: "" });
+
   const [showError, setShowError] = useState(false);
   const [showNotification, setShowNotification] = useState(false);
 
-  // Load from localStorage
+  // Load products on first render
   useEffect(() => {
     const stored = JSON.parse(localStorage.getItem("products") || "[]");
-    const cleaned = stored.map((p) => {
-      const qty = parseFloat((p.quantity || "").toString().trim()) || 0;
-      const total = parseFloat((p.totalPrice || "").toString().trim()) || 0;
-      const pricePerPiece = qty > 0 ? (total / qty).toFixed(2) : "0.00";
-      return { ...p, pricePerPiece };
-    });
-    setProducts(cleaned);
-    setFiltered(cleaned);
+    setProducts(stored);
+    setFiltered(stored);
+
     const uniqueCats = [
-      ...new Set(cleaned.map((p) => p.category?.toLowerCase()).filter(Boolean)),
+      ...new Set(stored.map((p) => p.category?.toLowerCase()).filter(Boolean)),
     ];
     setCategories(uniqueCats);
   }, []);
 
-  // Search filter
+  // Filter products based on search
   useEffect(() => {
     const filteredList = products.filter((product) => {
       const matchCategory = searchCategory
@@ -48,53 +37,40 @@ function ShowProducts() {
         : true;
       return matchCategory && matchName;
     });
-    setFiltered(filteredList.reverse()); // Show latest first
+    setFiltered(filteredList);
   }, [searchCategory, searchName, products]);
 
-  // Total value = sum of quantity * pricePerPiece
+  // Calculate total inventory value
   const totalValue = filtered.reduce((acc, p) => {
-    const qty = parseFloat(p.quantity?.toString().trim()) || 0;
-    const unitPrice = parseFloat(p.pricePerPiece?.toString().trim()) || 0;
-    return acc + qty * unitPrice;
+    const qty = parseFloat(p.quantity || 0);
+    const price = parseFloat((p.pricePerPiece || "").toString().trim());
+    const total = qty * price;
+    return acc + (isNaN(total) ? 0 : total);
   }, 0);
 
-  // Input change
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    let updatedData = { ...formData, [name]: value };
+  // Calculate total revenue from sold products
+  const soldItems = JSON.parse(localStorage.getItem("sold") || "[]");
+  const totalRevenue = soldItems.reduce((acc, item) => {
+    const rev = parseFloat(item.revenue || 0);
+    return acc + (isNaN(rev) ? 0 : rev);
+  }, 0);
 
-    const quantity = parseFloat(updatedData.quantity);
-    const totalPrice = parseFloat(updatedData.totalPrice);
-    if (!isNaN(quantity) && !isNaN(totalPrice) && quantity > 0) {
-      updatedData.pricePerPiece = (totalPrice / quantity).toFixed(2);
-    } else {
-      updatedData.pricePerPiece = "";
-    }
-
-    setFormData(updatedData);
-  };
-
-  // Edit
   const handleEditClick = (index) => {
-    setEditIndex(index);
     const p = filtered[index];
-    setFormData({
-      name: p.name || "",
-      quantity: p.quantity || "",
-      totalPrice: p.totalPrice || "",
-      category: p.category || "",
-      size: p.size || "",
-      pricePerPiece: p.pricePerPiece || "",
-      sellingPrice: p.sellingPrice || "",
-    });
+    setEditIndex(index);
+    setFormData({ quantity: p.quantity || "" });
     setShowError(false);
   };
 
-  // Save changes
+  const handleChange = (e) => {
+    setFormData({ quantity: e.target.value });
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
-    const { name, quantity, totalPrice, category, size, sellingPrice } = formData;
-    if (!name || !quantity || !totalPrice || !category || !size || !sellingPrice) {
+    const newQty = parseFloat(formData.quantity);
+
+    if (isNaN(newQty) || newQty < 0) {
       setShowError(true);
       return;
     }
@@ -102,26 +78,60 @@ function ShowProducts() {
     const updatedProducts = [...products];
     const productToEdit = filtered[editIndex];
 
-    const originalIndex = products.findIndex(
+    const productIndex = products.findIndex(
       (p) =>
         p.name === productToEdit.name &&
         p.category === productToEdit.category &&
         p.size === productToEdit.size &&
-        p.quantity === productToEdit.quantity &&
-        p.totalPrice === productToEdit.totalPrice
+        p.totalPrice === productToEdit.totalPrice &&
+        p.quantity === productToEdit.quantity
     );
 
-    if (originalIndex !== -1) {
-      updatedProducts[originalIndex] = formData;
-      setProducts(updatedProducts);
-      setFiltered(updatedProducts.reverse()); // latest first
-      localStorage.setItem("products", JSON.stringify(updatedProducts));
-      setShowNotification(true);
-      setTimeout(() => setShowNotification(false), 1500);
+    if (productIndex === -1) return;
+
+    const original = { ...products[productIndex] };
+    const oldQty = parseFloat(original.quantity);
+    const costPrice = parseFloat(original.pricePerPiece || 0);
+    const sellingPrice = parseFloat(original.sellingPrice || 0);
+    const soldQty = oldQty - newQty;
+
+    if (soldQty > 0) {
+      const soldEntry = {
+        name: original.name,
+        category: original.category,
+        size: original.size,
+        quantity: soldQty,
+        pricePerPiece: costPrice,
+        sellingPrice: sellingPrice,
+        revenue: ((sellingPrice - costPrice) * soldQty).toFixed(2),
+        date: new Date().toISOString(),
+      };
+
+      const existingSold = JSON.parse(localStorage.getItem("sold") || "[]");
+      localStorage.setItem(
+        "sold",
+        JSON.stringify([...existingSold, soldEntry])
+      );
     }
+
+    if (newQty === 0) {
+      updatedProducts.splice(productIndex, 1);
+    } else {
+      original.quantity = newQty.toString();
+      original.pricePerPiece = (
+        parseFloat(original.totalPrice) / newQty
+      ).toFixed(2);
+      updatedProducts[productIndex] = original;
+    }
+
+    setProducts(updatedProducts);
+    setFiltered(updatedProducts);
+    localStorage.setItem("products", JSON.stringify(updatedProducts));
 
     setEditIndex(null);
     setShowError(false);
+    setShowNotification(true);
+    setTimeout(() => setShowNotification(false), 1500);
   };
 
   const handleCancel = () => {
@@ -142,14 +152,15 @@ function ShowProducts() {
           <h3>
             Total Value: <p>{totalValue.toFixed(2)}</p>
           </h3>
+          <h3>
+            Total Revenue: <p>{totalRevenue.toFixed(2)}</p>
+          </h3>
         </div>
 
         <div id="show-products-search">
           <div id="search-by-category">
-            <h4>Search by categories</h4>
+            <h4>Search by Category</h4>
             <select
-              name="categories"
-              id="categories"
               value={searchCategory}
               onChange={(e) => setSearchCategory(e.target.value)}
             >
@@ -163,7 +174,7 @@ function ShowProducts() {
           </div>
 
           <div id="search-by-name">
-            <h4>Search by name</h4>
+            <h4>Search by Name</h4>
             <input
               type="text"
               value={searchName}
@@ -221,7 +232,7 @@ function ShowProducts() {
                     id="show-pro-edit-btn"
                     onClick={() => handleEditClick(index)}
                   >
-                    Edit
+                    Sell
                   </button>
                 </div>
               );
@@ -231,68 +242,20 @@ function ShowProducts() {
 
         {editIndex !== null && (
           <div id="show-pro-edit-form">
-            <h2>Edit Product</h2>
+            <h2>Edit Quantity</h2>
             <form id="edit-product-form" onSubmit={handleSubmit}>
-              <input
-                type="text"
-                name="name"
-                placeholder="Product Name"
-                value={formData.name}
-                onChange={handleChange}
-              />
               <input
                 type="number"
                 name="quantity"
-                placeholder="Product Quantity"
+                placeholder="New Quantity"
                 value={formData.quantity}
                 onChange={handleChange}
                 className="no-spinner"
               />
-              <input
-                type="number"
-                name="totalPrice"
-                placeholder="Total Spend"
-                value={formData.totalPrice}
-                onChange={handleChange}
-                className="no-spinner"
-              />
-              <input
-                type="text"
-                name="category"
-                placeholder="Product Category"
-                value={formData.category}
-                onChange={handleChange}
-                list="category-options"
-              />
-              <datalist id="category-options">
-                {categories.map((cat, idx) => (
-                  <option key={idx} value={cat} />
-                ))}
-              </datalist>
-              <input
-                type="text"
-                name="size"
-                placeholder="Product Size"
-                value={formData.size}
-                onChange={handleChange}
-              />
-              <input
-                type="text"
-                name="pricePerPiece"
-                placeholder="Price per piece"
-                value={formData.pricePerPiece}
-                readOnly
-              />
-              <input
-                type="number"
-                name="sellingPrice"
-                placeholder="Selling Price per piece"
-                value={formData.sellingPrice}
-                onChange={handleChange}
-                className="no-spinner"
-              />
-              {showError && <p className="form-error">Fill all the form fields</p>}
-              <button type="submit">Save Changes</button>
+              {showError && (
+                <p className="form-error">Enter valid quantity (0 or more)</p>
+              )}
+              <button type="submit">Update</button>
               <button
                 type="button"
                 onClick={handleCancel}
@@ -304,9 +267,7 @@ function ShowProducts() {
           </div>
         )}
 
-        {showNotification && (
-          <div id="add-pro-notification">Product updated</div>
-        )}
+        {showNotification && <div id="add-pro-notification">Updated</div>}
       </div>
     </div>
   );

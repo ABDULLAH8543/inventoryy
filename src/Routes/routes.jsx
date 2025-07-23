@@ -6,10 +6,10 @@ import Add from "../pages/addProducts/addProducts";
 import Sidebar from "../pages/SideBar/sideBar";
 import ShowProducts from "../pages/showProducts/showProducts";
 import ToDo from "../pages/toDo";
-import SellProducts from "../pages/sellProducts";
+import SellProducts from "../pages/sellProducts/sellProducts";
 import PreviousDay from "../pages/previousDay";
 import PreviousReport from "../pages/previousReport";
-import Ongoing from "../pages/onGoingSales";
+import Ongoing from "../pages/onGoingSales/onGoingSales";
 
 const Mainpage = () => {
   return (
