@@ -27,26 +27,55 @@
   }
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
 }
-
+#graph {
+  height: 250px;
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+#main-graph {
+  width: 100vw;
+}
 #total-products,
 #total-catagories,
-#todo-list,
+#todo,
 #todays-profit,
-#previous-day-sales {
+#previous-day-sales,
+#previous-month-sales {
   box-shadow: 0 4px 30px rgba(0, 0, 0, 0.537);
   height: 150px;
   width: 200px;
   border-radius: 20px;
   color: white;
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
   background-color: purple;
+  font-size: 20px;
+  cursor: pointer;
+}
+#total-products p,
+#total-catagories p,
+#todo p,
+#todays-profit p,
+#previous-day-sales p,
+#previous-month-sales p {
+  margin-bottom: 10px;
 }
 #graph {
   grid-column: 1 / -1;
   position: relative;
   right: 40px;
+}
+@media screen and (min-width: 1300px) {
+  #graph {
+    height: 290px;
+    overflow-x: auto;
+    overflow-y: hidden;
+  }
+  #main-graph {
+    width: 50vw;
+  }
 }
 @media screen and (max-width: 1000px) {
   #dashboard-options {
@@ -62,9 +91,10 @@
 @media screen and (max-width: 706px) {
   #total-products,
   #total-catagories,
-  #todo-list,
+  #todo,
   #todays-profit,
-  #previous-day-sales {
+  #previous-day-sales,
+  #previous-month-sales {
     margin: auto;
     width: 60vw;
   }
@@ -79,9 +109,10 @@
   }
   #total-products,
   #total-catagories,
-  #todo-list,
+  #todo,
   #todays-profit,
-  #previous-day-sales {
+  #previous-day-sales,
+  #previous-month-sales {
     margin: auto;
     width: 60vw;
   }

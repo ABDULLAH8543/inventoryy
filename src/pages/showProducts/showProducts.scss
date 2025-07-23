@@ -1,0 +1,116 @@
+#show-products-outer {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+#show-product-total {
+  display: flex;
+  width: 600px;
+  justify-content: space-between;
+  margin-top: 30px;
+  border-bottom: 2px solid purple;
+  padding-bottom: 10px;
+  h3 {
+    display: flex;
+  }
+  p {
+    background-color: gold;
+    color: black;
+    width: fit-content;
+    padding: 2px 5px;
+  }
+}
+#show-products-search {
+  margin-top: 10px;
+  display: flex;
+  flex-direction: row;
+  width: 600px;
+  border-bottom: 2px solid purple;
+  justify-content: space-between;
+  padding-bottom: 10px;
+}
+#search-by-category,
+#search-by-name {
+  display: flex;
+  padding: 0px 20px;
+  select {
+    position: relative;
+    left: 5px;
+  }
+  input {
+    position: relative;
+    left: 5px;
+    outline: none;
+    border: none;
+    caret-color: purple;
+    font-size: 15px;
+    border-bottom: 2px solid purple;
+  }
+}
+#show-products-list {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  max-height: 370px;
+  overflow: auto;
+}
+#show-product-card {
+  border: 1px solid purple;
+  border-radius: 5px;
+  padding: 10px;
+  margin: 10px 0;
+  height: fit-content;
+  width: 280px;
+}
+#show-pro-edit-btn {
+  background-color: navy;
+  border: none;
+  outline: none;
+  padding: 5px 10px;
+  border-radius: 10px;
+  color: white;
+  cursor: pointer;
+}
+#show-pro-edit-form {
+  position: absolute;
+  top: 0px;
+}
+.highlight {
+  color: blue;
+  font-size: 17px;
+  font-weight: 700;
+}
+@media screen and (max-width: 1200px) {
+  #show-products-list {
+    max-height: 70vh;
+  }
+}
+@media screen and (max-width: 750px) {
+  #show-product-total {
+    width: fit-content;
+    flex-direction: column;
+    margin-top: 10px;
+  }
+  #show-products-search {
+    display: flex;
+    flex-direction: column;
+    width: fit-content;
+  }
+  #show-products-list {
+    grid-template-columns: repeat(1, 1fr);
+    margin: auto;
+    height: 460px;
+    padding-bottom: 70px;
+  }
+}
+@media screen and (max-width: 500px) {
+  #show-product-card {
+    width: 100%;
+  }
+  #search-by-name {
+    input {
+      font-size: 12px;
+    }
+  }
+}

@@ -1,10 +1,10 @@
 import React from "react";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
-import NavBar from "../pages/navBar";
-import Dashboard from "../pages/dashboard";
-import Add from "../pages/addProducts";
-import Sidebar from "../pages/sideBar";
-import ShowProducts from "../pages/showProducts";
+import NavBar from "../pages/navBar/navBar";
+import Dashboard from "../pages/dashboard/dashboard";
+import Add from "../pages/addProducts/addProducts";
+import Sidebar from "../pages/SideBar/sideBar";
+import ShowProducts from "../pages/showProducts/showProducts";
 import ToDo from "../pages/toDo";
 import SellProducts from "../pages/sellProducts";
 import PreviousDay from "../pages/previousDay";
