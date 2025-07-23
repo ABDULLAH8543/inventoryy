@@ -1,25 +1,33 @@
-// src/pages/onGoingSales/Ongoing.jsx
+// src/pages/previousDay/PreviousDay.jsx
 import React, { useEffect, useState } from "react";
-import "./ongoingsales.scss"; // optional styling file
+import "./previousDay.scss"; // Assuming you have a CSS file for styling
 
-function Ongoing() {
+function PreviousDay() {
   const [soldItems, setSoldItems] = useState([]);
 
   useEffect(() => {
-    const today = new Date().toLocaleDateString("en-GB");
     const stored = JSON.parse(localStorage.getItem("sold") || "[]");
-    const todaysSales = stored.filter((item) => item.date === today);
-    setSoldItems(todaysSales);
+
+    // Get yesterday's date in dd/mm/yyyy format
+    const yesterday = new Date();
+    yesterday.setDate(yesterday.getDate() - 1);
+    const formattedYesterday = yesterday.toLocaleDateString("en-GB"); // e.g., "22/07/2025"
+
+    const previousDaySales = stored.filter(
+      (item) => item.date === formattedYesterday
+    );
+
+    setSoldItems(previousDaySales);
   }, []);
 
   return (
-    <div id="ongoing-sales-outer">
-      <h2>Ongoing Sales (Today)</h2>
+    <div id="previous-day-sales-outer">
+      <h2>Previous Day Sales</h2>
       {soldItems.length === 0 ? (
-        <p>No products sold yet today.</p>
+        <p>No products sold yesterday.</p>
       ) : (
         soldItems.map((item, idx) => (
-          <div id="ongoing-sales-card" key={idx}>
+          <div id="previous-day-sales-card" key={idx}>
             <p>
               <strong>Name:</strong> {item.name}
             </p>
@@ -36,7 +44,7 @@ function Ongoing() {
               <strong>Price Per Piece:</strong> {item.pricePerPiece}
             </p>
             <p>
-              <strong>Selling Price Per Piece:</strong> {item.sellingPrice}
+              <strong>Selling Price:</strong> {item.sellingPrice}
             </p>
             <p>
               <strong>Revenue (Profit):</strong> {item.revenue}
@@ -51,4 +59,4 @@ function Ongoing() {
   );
 }
 
-export default Ongoing;
+export default PreviousDay;

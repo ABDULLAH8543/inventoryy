@@ -20,24 +20,16 @@ function ShowProducts() {
   const [showError, setShowError] = useState(false);
   const [showNotification, setShowNotification] = useState(false);
 
-  // Load from localStorage
   useEffect(() => {
     const stored = JSON.parse(localStorage.getItem("products") || "[]");
-    const cleaned = stored.map((p) => {
-      const qty = parseFloat((p.quantity || "").toString().trim()) || 0;
-      const total = parseFloat((p.totalPrice || "").toString().trim()) || 0;
-      const pricePerPiece = qty > 0 ? (total / qty).toFixed(2) : "0.00";
-      return { ...p, pricePerPiece };
-    });
-    setProducts(cleaned);
-    setFiltered(cleaned);
+    setProducts(stored);
+    setFiltered(stored);
     const uniqueCats = [
-      ...new Set(cleaned.map((p) => p.category?.toLowerCase()).filter(Boolean)),
+      ...new Set(stored.map((p) => p.category?.toLowerCase()).filter(Boolean)),
     ];
     setCategories(uniqueCats);
   }, []);
 
-  // Search filter
   useEffect(() => {
     const filteredList = products.filter((product) => {
       const matchCategory = searchCategory
@@ -48,33 +40,30 @@ function ShowProducts() {
         : true;
       return matchCategory && matchName;
     });
-    setFiltered(filteredList.reverse()); // Show latest first
+    setFiltered(filteredList.reverse());
   }, [searchCategory, searchName, products]);
 
-  // Total value = sum of quantity * pricePerPiece
   const totalValue = filtered.reduce((acc, p) => {
     const qty = parseFloat(p.quantity?.toString().trim()) || 0;
     const unitPrice = parseFloat(p.pricePerPiece?.toString().trim()) || 0;
     return acc + qty * unitPrice;
   }, 0);
 
-  // Input change
   const handleChange = (e) => {
     const { name, value } = e.target;
     let updatedData = { ...formData, [name]: value };
 
-    const quantity = parseFloat(updatedData.quantity);
-    const totalPrice = parseFloat(updatedData.totalPrice);
-    if (!isNaN(quantity) && !isNaN(totalPrice) && quantity > 0) {
-      updatedData.pricePerPiece = (totalPrice / quantity).toFixed(2);
-    } else {
-      updatedData.pricePerPiece = "";
+    if (editIndex !== null) {
+      const quantity = parseFloat(updatedData.quantity);
+      const totalPrice = parseFloat(updatedData.totalPrice);
+      if (!isNaN(quantity) && !isNaN(totalPrice) && quantity > 0) {
+        updatedData.pricePerPiece = (totalPrice / quantity).toFixed(2);
+      }
     }
 
     setFormData(updatedData);
   };
 
-  // Edit
   const handleEditClick = (index) => {
     setEditIndex(index);
     const p = filtered[index];
@@ -90,18 +79,24 @@ function ShowProducts() {
     setShowError(false);
   };
 
-  // Save changes
   const handleSubmit = (e) => {
     e.preventDefault();
-    const { name, quantity, totalPrice, category, size, sellingPrice } = formData;
-    if (!name || !quantity || !totalPrice || !category || !size || !sellingPrice) {
+    const { name, quantity, totalPrice, category, size, sellingPrice } =
+      formData;
+    if (
+      !name ||
+      !quantity ||
+      !totalPrice ||
+      !category ||
+      !size ||
+      !sellingPrice
+    ) {
       setShowError(true);
       return;
     }
 
     const updatedProducts = [...products];
     const productToEdit = filtered[editIndex];
-
     const originalIndex = products.findIndex(
       (p) =>
         p.name === productToEdit.name &&
@@ -114,7 +109,7 @@ function ShowProducts() {
     if (originalIndex !== -1) {
       updatedProducts[originalIndex] = formData;
       setProducts(updatedProducts);
-      setFiltered(updatedProducts.reverse()); // latest first
+      setFiltered([...updatedProducts].reverse());
       localStorage.setItem("products", JSON.stringify(updatedProducts));
       setShowNotification(true);
       setTimeout(() => setShowNotification(false), 1500);
@@ -180,10 +175,7 @@ function ShowProducts() {
             filtered.map((product, index) => {
               const quantity = parseFloat(product.quantity || 0);
               const totalPrice = parseFloat(product.totalPrice || 0);
-              const pricePerPiece =
-                quantity && totalPrice
-                  ? (totalPrice / quantity).toFixed(2)
-                  : "0.00";
+              const pricePerPiece = product.pricePerPiece || "0.00";
 
               return (
                 <div id="show-product-card" key={index}>
@@ -291,7 +283,9 @@ function ShowProducts() {
                 onChange={handleChange}
                 className="no-spinner"
               />
-              {showError && <p className="form-error">Fill all the form fields</p>}
+              {showError && (
+                <p className="form-error">Fill all the form fields</p>
+              )}
               <button type="submit">Save Changes</button>
               <button
                 type="button"

@@ -7,26 +7,21 @@ function ShowProducts() {
   const [categories, setCategories] = useState([]);
   const [searchCategory, setSearchCategory] = useState("");
   const [searchName, setSearchName] = useState("");
-
   const [editIndex, setEditIndex] = useState(null);
   const [formData, setFormData] = useState({ quantity: "" });
-
   const [showError, setShowError] = useState(false);
   const [showNotification, setShowNotification] = useState(false);
 
-  // Load products on first render
   useEffect(() => {
     const stored = JSON.parse(localStorage.getItem("products") || "[]");
     setProducts(stored);
-    setFiltered(stored);
-
+    setFiltered([...stored].reverse());
     const uniqueCats = [
       ...new Set(stored.map((p) => p.category?.toLowerCase()).filter(Boolean)),
     ];
     setCategories(uniqueCats);
   }, []);
 
-  // Filter products based on search
   useEffect(() => {
     const filteredList = products.filter((product) => {
       const matchCategory = searchCategory
@@ -37,22 +32,13 @@ function ShowProducts() {
         : true;
       return matchCategory && matchName;
     });
-    setFiltered(filteredList);
+    setFiltered([...filteredList].reverse());
   }, [searchCategory, searchName, products]);
 
-  // Calculate total inventory value
   const totalValue = filtered.reduce((acc, p) => {
     const qty = parseFloat(p.quantity || 0);
-    const price = parseFloat((p.pricePerPiece || "").toString().trim());
-    const total = qty * price;
-    return acc + (isNaN(total) ? 0 : total);
-  }, 0);
-
-  // Calculate total revenue from sold products
-  const soldItems = JSON.parse(localStorage.getItem("sold") || "[]");
-  const totalRevenue = soldItems.reduce((acc, item) => {
-    const rev = parseFloat(item.revenue || 0);
-    return acc + (isNaN(rev) ? 0 : rev);
+    const price = parseFloat(p.pricePerPiece || 0);
+    return acc + qty * price;
   }, 0);
 
   const handleEditClick = (index) => {
@@ -104,7 +90,7 @@ function ShowProducts() {
         pricePerPiece: costPrice,
         sellingPrice: sellingPrice,
         revenue: ((sellingPrice - costPrice) * soldQty).toFixed(2),
-        date: new Date().toISOString(),
+        date: new Date().toLocaleDateString("en-GB"),
       };
 
       const existingSold = JSON.parse(localStorage.getItem("sold") || "[]");
@@ -118,14 +104,11 @@ function ShowProducts() {
       updatedProducts.splice(productIndex, 1);
     } else {
       original.quantity = newQty.toString();
-      original.pricePerPiece = (
-        parseFloat(original.totalPrice) / newQty
-      ).toFixed(2);
       updatedProducts[productIndex] = original;
     }
 
     setProducts(updatedProducts);
-    setFiltered(updatedProducts);
+    setFiltered([...updatedProducts].reverse());
     localStorage.setItem("products", JSON.stringify(updatedProducts));
 
     setEditIndex(null);
@@ -151,9 +134,6 @@ function ShowProducts() {
           </h3>
           <h3>
             Total Value: <p>{totalValue.toFixed(2)}</p>
-          </h3>
-          <h3>
-            Total Revenue: <p>{totalRevenue.toFixed(2)}</p>
           </h3>
         </div>
 
@@ -190,11 +170,8 @@ function ShowProducts() {
           ) : (
             filtered.map((product, index) => {
               const quantity = parseFloat(product.quantity || 0);
-              const totalPrice = parseFloat(product.totalPrice || 0);
-              const pricePerPiece =
-                quantity && totalPrice
-                  ? (totalPrice / quantity).toFixed(2)
-                  : "0.00";
+              const pricePerPiece = parseFloat(product.pricePerPiece || 0);
+              const total = (quantity * pricePerPiece).toFixed(2);
 
               return (
                 <div id="show-product-card" key={index}>
@@ -216,11 +193,17 @@ function ShowProducts() {
                   </p>
                   <p>
                     <strong>Total Spend:</strong>{" "}
-                    <span className="highlight">{totalPrice}</span>
+                    <span className="highlight">{product.totalPrice}</span>
                   </p>
                   <p>
                     <strong>Price per Piece:</strong>{" "}
-                    <span className="highlight">{pricePerPiece}</span>
+                    <span className="highlight">
+                      {pricePerPiece.toFixed(2)}
+                    </span>
+                  </p>
+                  <p>
+                    <strong>Total Value:</strong>{" "}
+                    <span className="highlight">{total}</span>
                   </p>
                   <p>
                     <strong>Selling Price:</strong>{" "}
