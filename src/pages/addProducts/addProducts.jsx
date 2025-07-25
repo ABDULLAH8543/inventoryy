@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import "./AddProducts.scss";
+import "./addProducts.scss";
 
 function AddProduct() {
   const [formData, setFormData] = useState({
