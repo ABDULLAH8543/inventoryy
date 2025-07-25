@@ -238,7 +238,7 @@ function ShowProducts() {
               {showError && (
                 <p className="form-error">Enter valid quantity (0 or more)</p>
               )}
-              <button type="submit">Update</button>
+              <button type="submit">SELL</button>
               <button
                 type="button"
                 onClick={handleCancel}

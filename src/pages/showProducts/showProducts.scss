@@ -10,7 +10,7 @@
   width: 600px;
   justify-content: space-between;
   margin-top: 30px;
-  border-bottom: 2px solid purple;
+  border-bottom: 2px solid navy;
   padding-bottom: 10px;
   h3 {
     display: flex;
@@ -27,7 +27,7 @@
   display: flex;
   flex-direction: row;
   width: 600px;
-  border-bottom: 2px solid purple;
+  border-bottom: 2px solid navy;
   justify-content: space-between;
   padding-bottom: 10px;
 }
@@ -44,9 +44,9 @@
     left: 5px;
     outline: none;
     border: none;
-    caret-color: purple;
+    caret-color: navy;
     font-size: 15px;
-    border-bottom: 2px solid purple;
+    border-bottom: 2px solid navy;
   }
 }
 #show-products-list {
@@ -56,7 +56,7 @@
   overflow: auto;
 }
 #show-product-card {
-  border: 2px solid purple;
+  border: 2px solid navy;
   border-radius: 5px;
   padding: 10px;
   margin: 10px 0;
@@ -84,7 +84,7 @@
   font-weight: 700;
 }
 #show-pro-edit-form{
-  border: 2px solid purple;
+  border: 2px solid navy;
   background-color: white;
   display: flex;
   flex-direction: column;
@@ -96,7 +96,7 @@
       width: fit-content;
       margin: auto;
       padding: 5px 10px;
-      background-color: purple;
+      background-color: navy;
       color: white;
       outline: none;
       border: none;
