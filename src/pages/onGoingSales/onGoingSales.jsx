@@ -1,6 +1,6 @@
 // src/pages/onGoingSales/Ongoing.jsx
 import React, { useEffect, useState } from "react";
-import "./ongoingsales.scss"; // optional styling file
+import "./ongoingSales.scss"; // optional styling file
 
 function Ongoing() {
   const [soldItems, setSoldItems] = useState([]);
